@@ -391,11 +391,11 @@ const RateChargesComponent = () => {
       
       try {
         console.log(invoiceId,subInvoiceId,from)
-        // localhost:3000/invoices/6537515bfc7edf55be092cc2
-        const data={"receivable":true}
-      //   const response = await axiosInstance.delete(`/invoices/${invoiceId}/subinvoice/${subInvoiceId}`,data);
-      //   console.log("response", response.data);
-      //  fetchData()
+       
+        const data={  "text": "payable"}
+        const response = await axiosInstance.delete(`/invoices/${invoiceId}/subinvoice/${subInvoiceId}`,data);
+        console.log("response", response.data);
+       fetchData()
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
@@ -415,11 +415,12 @@ const RateChargesComponent = () => {
 
     }else if(from =="subRowPayable"){
       try {
-        // localhost:3000/invoices/6537515bfc7edf55be092cc2
-        // const response = await axiosInstance.get(`/invoices/${invoiceId}`);
-        // console.log("response", response.data);
-        // SetInitialRow(response.data);
-        // setRows(response.data);
+        console.log(invoiceId,subInvoiceId,from)
+       
+        const data={  "text": "receivable"}
+        const response = await axiosInstance.delete(`/invoices/${invoiceId}/subinvoice/${subInvoiceId}`,data);
+        console.log("response", response.data);
+       fetchData()
       } catch (error) {
         console.error("Error fetching employees:", error);
       }

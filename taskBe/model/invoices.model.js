@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const receviableSchema = new mongoose.Schema({
+const receivableSchema = new mongoose.Schema({
     rateName: { type: String, default: '' },
     invoiceDescription: { type: String, default: '' },
     rate: { type: Number, default: 0 },
@@ -18,11 +18,11 @@ const payableSchema = new mongoose.Schema({
 });
 
 const schema = new mongoose.Schema({
-    receviable: receviableSchema,
+    receivable: receivableSchema,
     payable: payableSchema,
     subInvoice: {
         type: [{
-            receviable: receviableSchema,
+            receivable: receivableSchema,
             payable: payableSchema
         }],
         default: [],

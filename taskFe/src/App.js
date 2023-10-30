@@ -1,18 +1,14 @@
-import React from 'react';
-
-import './App.css';
-import EmployeeList from './component/RateChargesComponent';
-import RateChargesComponent from './component/RateChargesComponent';
+import React from 'react'
+import RateChargesComponent from './component/RateChargesComponent'
 
 
-function App() {
-  
+const App = () => {
   return (
-    <>
- <RateChargesComponent/>
-   
-    </>
-  );
+   <>
+   <RateChargesComponent/>
+  
+   </>
+  )
 }
 
-export default App;
+export default App

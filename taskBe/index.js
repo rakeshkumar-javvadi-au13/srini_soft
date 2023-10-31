@@ -66,6 +66,7 @@ app.put('/invoices/subinvoice/:id', async (req, res) => {
 
 app.delete('/invoices/:id/subinvoice/:subinvoiceId', async (req, res) => {
     try {
+        console.log("id:",req.params.id,"subid",req.params.subinvoiceId,"body",req.body)
         if (!req.params.subinvoiceId || !req.params.id) {
             return res.status(400).send('Id cannot be empty');
         }
@@ -79,7 +80,7 @@ app.delete('/invoices/:id/subinvoice/:subinvoiceId', async (req, res) => {
                     { new: true }
                 );
                 res.status(200).send(invoice);
-            } else {
+            } else if (req.body.text === 'receivable') {
                 const invoice = await Invoices.findOneAndUpdate(
                     { 'subInvoice._id': req.params.subinvoiceId },
                     { $unset: { 'subInvoice.$.receivable': 1 } },

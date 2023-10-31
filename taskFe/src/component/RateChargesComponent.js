@@ -392,8 +392,9 @@ const RateChargesComponent = () => {
       try {
         console.log(invoiceId,subInvoiceId,from)
        
-        const data={  "text": "payable"}
-        const response = await axiosInstance.delete(`/invoices/${invoiceId}/subinvoice/${subInvoiceId}`,data);
+        const data={text: "receivable"}
+       
+        const response = await axiosInstance.delete(`/invoices/${invoiceId}/subinvoice/${subInvoiceId}`,{ data: {text: "receivable"}});
         console.log("response", response.data);
        fetchData()
       } catch (error) {
@@ -414,13 +415,14 @@ const RateChargesComponent = () => {
       }
 
     }else if(from =="subRowPayable"){
+      console.log("rakesh")
       try {
         console.log(invoiceId,subInvoiceId,from)
        
-        const data={  "text": "receivable"}
-        const response = await axiosInstance.delete(`/invoices/${invoiceId}/subinvoice/${subInvoiceId}`,data);
+        // const data={text:"payable"}
+        const response = await axiosInstance.delete(`/invoices/${invoiceId}/subinvoice/${subInvoiceId}`,{ data: {text: "payable"}});
         console.log("response", response.data);
-       fetchData()
+      //  fetchData()
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
@@ -694,7 +696,7 @@ const RateChargesComponent = () => {
                          />
                        </IconButton>
                        <IconButton color="secondary" aria-label="Delete">
-                         <DeleteIcon    onClick={() => handleDeleteRow(row?._id, "subRowPayable",subInv?._id)} />
+                         <DeleteIcon    onClick={() => handleDeleteRow(row?._id, "subRowPayable",subInv._id)} />
                        </IconButton>
                      </TableCell>
                     </TableRow>

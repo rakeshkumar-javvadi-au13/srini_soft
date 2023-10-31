@@ -389,7 +389,7 @@ const RateChargesComponent = () => {
                   <AddIcon />
                 </IconButton>
               </TableCell>
-              <TableCell align="start" colSpan={8}>
+              <TableCell align="start" colSpan={7}>
                 Payables
               </TableCell>
             </TableRow>
@@ -661,6 +661,28 @@ const RateChargesComponent = () => {
                 </React.Fragment>
               );
             })}
+             <TableRow
+              style={{ top: 57,
+                height: 33,
+              }}
+            >
+              <TableCell align="center"  colSpan={2}>
+               <b>Total Revenue :</b>1021.56
+              </TableCell>
+             
+              <TableCell align="center"  colSpan={2}>
+              <b>Total Expenses :</b>1021.56
+              </TableCell>
+              <TableCell align="center" colSpan={2}>
+              <b>Net :</b>1021.56
+              </TableCell>
+              <TableCell align="center" colSpan={3}>
+              <b>Total Expense Percentage :</b>1021.56
+              </TableCell>
+              <TableCell align="center" colSpan={3}>
+              <b>PT Expense Percentage :</b> 1021.56
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>

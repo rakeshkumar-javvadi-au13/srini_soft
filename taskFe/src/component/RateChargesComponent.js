@@ -13,26 +13,32 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PetrolPumpIcon from "@mui/icons-material/LocalGasStation";
 import IconButton from "@mui/material/IconButton";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 const columns = [
-  { id: "rateName", label: "Rate Name", minWidth: 120, type: "text", align:"left", },
+  {
+    id: "rateName",
+    label: "Rate Name",
+    minWidth: 120,
+    type: "text",
+    align: "left",
+  },
   {
     id: "invoiceDescription",
     label: "Invoice Descr",
     minWidth: 120,
-    align:"left",
+    align: "left",
     type: "text",
   },
   {
     id: "rate",
     label: "Rate",
     minWidth: 30,
-    align:"right",
+    align: "right",
     type: "number",
   },
   {
@@ -55,10 +61,10 @@ const columns1 = [
     id: "payableDescription",
     label: "Payable Descr",
     minWidth: 120,
-    align:"left",
+    align: "left",
     type: "text",
   },
-  
+
   {
     id: "rate",
     label: "Rate",
@@ -110,25 +116,21 @@ const columns1 = [
 ];
 
 const RateChargesComponent = () => {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [rows, setRows] = useState([]);
-  const [open, setOpen] = useState(false);
- 
+
   const [response, setResponse] = useState({
-    message: '',
-    severity: 'success',
+    message: "",
+    severity: "success",
     open: false,
   });
 
-  // const [rows, setRows] = useState([]);
   const [editingRow, setEditingRow] = useState(null);
   const [editedRowData, setEditedRowData] = useState({});
   const [editingSubRow, setEditingSubRow] = useState(null);
   const [editedSubRowData, setEditedSubRowData] = useState({});
   const [isAddingRow, setIsAddingRow] = useState(false);
   const [isAddingSubRow, setIsAddingSubRow] = useState(false);
-  const [initialRow, SetInitialRow] = useState([]);
+ 
 
   const [newRowData, setNewRowData] = useState({
     receivable: {
@@ -147,7 +149,6 @@ const RateChargesComponent = () => {
       PT_Date: "",
     },
   });
-  
 
   useEffect(() => {
     fetchData();
@@ -156,41 +157,25 @@ const RateChargesComponent = () => {
     try {
       const response = await axiosInstance.get("/invoices");
       console.log("response", response.data);
-    
-      SetInitialRow(response.data);
+
+     
       setRows(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
     }
   };
 
-  
   const handleRowSubmit = async (updatedRow, rowId) => {
-    console.log("rakesh");
-    if (isAddingRow) {
-      try {
-        let data = {
+    try {
+      if (isAddingRow) {
+        const data = {
           receivable: updatedRow.receivable,
           payable: updatedRow.payable,
         };
         const response = await axiosInstance.post("/invoices", data);
-        console.log("response", response);
-       
-        fetchData();
-        setEditingRow(null);
-        setEditedRowData({});
-       
-        setIsAddingRow(false);
-        setResponse({message:"row has been added",severity:"success",open:true})
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-        setResponse({message:error.message,severity:"error",open:true})
-      }
-     
-    } else if (editingRow) {
-      console.log("editrow", updatedRow);
-      try {
-        let data = {
+        handleCommonSuccess(response, "Row has been added");
+      } else if (editingRow) {
+        const data = {
           receivable: updatedRow.receivable,
           payable: updatedRow.payable,
         };
@@ -198,21 +183,9 @@ const RateChargesComponent = () => {
           `/invoices/${updatedRow._id}`,
           data
         );
-        console.log("response", response.data);
-      
-        fetchData();
-        setEditingRow(null);
-        setEditedRowData({});
-       
-        setIsAddingRow(false);
-        // setRows(response.data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-    } else if (isAddingSubRow) {
-      console.log("editrow", updatedRow, rowId);
-      try {
-        let data = {
+        handleCommonSuccess(response, "Row has been edited");
+      } else if (isAddingSubRow) {
+        const data = {
           subInvoice: [
             {
               receivable: updatedRow.receivable,
@@ -224,20 +197,9 @@ const RateChargesComponent = () => {
           `/invoices/${rowId}/subinvoice`,
           data
         );
-
-        console.log("responseaddsub", response.data);
-        fetchData();
-        setEditingSubRow(null);
-        setEditedSubRowData({});
-        setIsAddingSubRow(false);
-        // setRows(response.data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-    } else if (editingSubRow) {
-      console.log("editrow", updatedRow);
-      try {
-        let data = {
+        handleCommonSuccess(response, "SubRow has been added");
+      } else if (editingSubRow) {
+        const data = {
           receivable: updatedRow.receivable,
           payable: updatedRow.payable,
         };
@@ -245,232 +207,197 @@ const RateChargesComponent = () => {
           `/invoices/subinvoice/${updatedRow._id}`,
           data
         );
-        console.log("response", response.data);
-        fetchData();
-        setEditingSubRow(null);
-      setEditedSubRowData({});
-        // setRows(response.data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
+        handleCommonSuccess(response, "Sub Row has been updated");
       }
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      setResponse({ message: error.message, severity: "error", open: true });
     }
   };
 
-  const deleteHandler=()=>{
+  const handleCommonSuccess = (response, successMessage) => {
+    console.log("response", response);
+    fetchData();
+    resetEditingState();
+    setResponse({ message: successMessage, severity: "success", open: true });
+  };
 
-  }
+  const resetEditingState = () => {
+    setEditingRow(null);
+    setEditingSubRow(null);
+    setEditedRowData({});
+    setEditedSubRowData({});
+    setIsAddingRow(false);
+    setIsAddingSubRow(false);
+  };
 
   const handleRowCancel = () => {
     setIsAddingRow(false);
     setIsAddingSubRow(false);
     setEditingRow(null);
     setEditingSubRow(null);
-    setRows(initialRow);
-    fetchData()
+   
+    fetchData();
   };
-  const handleEditRow = (row, isRow) => {
+  const handleEdit_AddRow = (row, isRow) => {
+    // Reset editing states
     setEditingRow(null);
     setEditedRowData({});
     setEditingSubRow(null);
     setEditedSubRowData({});
-    setRows(initialRow);
+   
 
-    if (isRow == "row") {
-      console.log("row", row);
-
+    if (isRow === "row") {
+  
       setEditingRow(row);
       setEditedRowData({ ...row });
-    } else if (isRow == "subRow") {
-      console.log("subrow", row);
+    } else if (isRow === "subRow") {
+     
       setEditingSubRow(row);
       setEditedSubRowData({ ...row });
-    } else if (isRow == "addSubRow") {
-      let data = {
-        receivable: {
-          rateName: "",
-          invoiceDescription: "",
-          rate: "",
-          unit: "",
-          amount: "",
-        },
-        payable: {
-          payableDescription: "",
-          rate: "",
-          unit: "",
-          amount: "",
-          truck: "",
-          PT_date: "",
-        },
-        _id: new Date().getTime(),
-      };
-
-      let newRows = rows;
-
-      const newsubRow = [...newRows];
-      newsubRow.forEach((item, index) => {
-        if (item._id === row._id) {
-          const subItem = item.subInvoice;
-          subItem.push(data);
-
-          newRows[index].subInvoice = subItem;
-        }
-      });
+    } else if (isRow === "addSubRow") {
+      const newRow = initializeData();
+      newRow._id = new Date().getTime();
+      const newRows = updateRowInRows(rows, row._id, newRow);
 
       setRows(newRows);
-      setEditingSubRow(data);
-      setEditedSubRowData(data);
+      setEditingSubRow(newRow);
+      setEditedSubRowData(newRow);
       setIsAddingSubRow(true);
-    }
-    else{
-      
-      let data={
-        receivable: {
-          rateName: "",
-          invoiceDescription: "",
-          rate: "",
-          unit: "",
-          amount: "",
-        },
-        payable: {
-          payableDescription: "",
-          rate: "",
-          unit: "",
-          amount: "",
-          truck: "",
-          PT_date: "",
-        },
-        _id: new Date().getTime()
-      }
-      
-      let newRows=rows
-   
-    //  const newsubRow=[...newRows]
-     console.log("addrownew",newRows)
-     newRows.push(data)
-      
-      setRows(newRows)
-      setEditingRow(data);
-      setEditedRowData(data);
-      setIsAddingRow(true)
-     
-     
+    } else {
+      const newRow = initializeData();
+      newRow._id = new Date().getTime();
+      const newRows = [...rows, newRow];
+
+      setRows(newRows);
+      setEditingRow(newRow);
+      setEditedRowData(newRow);
+      setIsAddingRow(true);
     }
   };
-  const handleDeleteRow = async(invoiceId,from,subInvoiceId) => {
-    handleRowCancel()
-  
-    if(from=="invoice"){
-   
-      try {
-      
-        // localhost:3000/invoices/6537515bfc7edf55be092cc2
-        const response = await axiosInstance.delete(`/invoices/${invoiceId}`);
-        console.log("response", response);
-        fetchData()
-        // SetInitialRow(response.data);
-        // setRows(response.data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
+
+  const initializeData = () => ({
+    receivable: {
+      rateName: "",
+      invoiceDescription: "",
+      rate: "",
+      unit: "",
+      amount: "",
+    },
+    payable: {
+      payableDescription: "",
+      rate: "",
+      unit: "",
+      amount: "",
+      truck: "",
+      PT_date: "",
+    },
+  });
+
+  const updateRowInRows = (rows, parentId, newRow) => {
+    return rows.map((row) => {
+      if (row._id === parentId) {
+        row.subInvoice.push(newRow);
       }
-      
-    }else if(from=="receivableRow"){
-      try {
-       
-       
-        const response = await axiosInstance.delete(`/invoices/receivable/${invoiceId}`);
-        console.log("response", response);
-        fetchData()
-        // SetInitialRow(response.data);
-        // setRows(response.data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-      
-    }
-    else if(from =="subRowReceivable"){
-      
-      try {
-        console.log(invoiceId,subInvoiceId,from)
-       
-        const data={text: "receivable"}
-       
-        const response = await axiosInstance.delete(`/invoices/${invoiceId}/subinvoice/${subInvoiceId}`,{ data: {text: "receivable"}});
-        console.log("response", response.data);
-       fetchData()
-      } catch (error) {
-        console.error("Error fetching employees:", error);
+      return row;
+    });
+  };
+
+  const handleDeleteRow = async (invoiceId, from, subInvoiceId) => {
+    handleRowCancel();
+
+    try {
+      let url, data;
+      switch (from) {
+        case "invoice":
+          url = `/invoices/${invoiceId}`;
+          break;
+        case "receivableRow":
+          url = `/invoices/receivable/${invoiceId}`;
+          break;
+        case "subRowReceivable":
+          url = `/invoices/${invoiceId}/subinvoice/${subInvoiceId}`;
+          data = { text: "receivable" };
+          break;
+        case "payableRow":
+          url = `/invoices/payable/${invoiceId}`;
+          break;
+        case "subRowPayable":
+          url = `/invoices/${invoiceId}/subinvoice/${subInvoiceId}`;
+          data = { text: "payable" };
+          break;
+        default:
+          console.error('Invalid "from" value');
+          return;
       }
 
-    }
-    else if(from =="payableRow"){
-      try {
-       
-       
-        const response = await axiosInstance.delete(`/invoices/payable/${invoiceId}`);
-        console.log("response", response);
-        fetchData()
-       
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
+      const response = await axiosInstance.delete(url, { data });
 
-    }else if(from =="subRowPayable"){
-      console.log("rakesh")
-      try {
-        console.log(invoiceId,subInvoiceId,from)
-       
-        // const data={text:"payable"}
-        const response = await axiosInstance.delete(`/invoices/${invoiceId}/subinvoice/${subInvoiceId}`,{ data: {text: "payable"}});
-        console.log("response", response.data);
-      //  fetchData()
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-
+      console.log("response", response);
+      fetchData();
+     
+    } catch (error) {
+      console.error("Error deleting row:", error);
     }
-    
   };
   const handleClose = () => {
-    setResponse({message:"",severity:"success",open:false})
+    setResponse({ message: "", severity: "success", open: false });
   };
 
   return (
     <Paper sx={{ width: "100%" }}>
-      <TableContainer sx={{ maxHeight: "100vh" }}  >
-        <Table stickyHeader aria-label="sticky table" size="small" sx={{ minWidth: 650 }} >
-        <Snackbar open={response.open} autoHideDuration={3000} onClose={handleClose}       anchorOrigin={{ vertical: 'top', horizontal: 'center' }} >
-        <MuiAlert elevation={6} variant="filled" severity={response.severity} onClose={handleClose}>
-          {response.message}
-        </MuiAlert>
-      </Snackbar>
-        
+      <TableContainer sx={{ maxHeight: "100vh" }}>
+        <Table
+          stickyHeader
+          aria-label="sticky table"
+          size="small"
+          sx={{ minWidth: 650 }}
+        >
+          <Snackbar
+            open={response.open}
+            autoHideDuration={3000}
+            onClose={handleClose}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          >
+            <MuiAlert
+              elevation={6}
+              variant="filled"
+              severity={response.severity}
+              onClose={handleClose}
+            >
+              {response.message}
+            </MuiAlert>
+          </Snackbar>
+
           <TableHead>
-            <TableRow style={{
-                    height: 33
-                  }}>
+            <TableRow
+              style={{
+                height: 33,
+              }}
+            >
               <TableCell align="start" colSpan={1}>
                 Receivables
               </TableCell>
-              <TableCell align="start" colSpan={5} >
-           
+              <TableCell align="start" colSpan={5}>
                 <IconButton
                   color="primary"
                   aria-label="Add"
-                  
-                  onClick={handleEditRow}
-                  sx={{fontSize:12}}
+                  onClick={handleEdit_AddRow}
+                  sx={{ fontSize: 12 }}
                 >
-                 ADD ROW
+                  ADD ROW
                   <AddIcon />
                 </IconButton>
               </TableCell>
-              <TableCell align="start" colSpan={6}>
+              <TableCell align="start" colSpan={8}>
                 Payables
               </TableCell>
             </TableRow>
-            <TableRow style={{
-                    height: 33
-                  }}>
+            <TableRow
+              style={{
+                height: 33,
+              }}
+            >
               <TableCell key="modify" style={{ top: 57, minWidth: 120 }}>
                 Modify
               </TableCell>
@@ -492,19 +419,23 @@ const RateChargesComponent = () => {
                   {column.label}
                 </TableCell>
               ))}
-               <TableCell key="action" style={{ top: 57, minWidth: 150 }}>
+              <TableCell key="action" style={{ top: 57, minWidth: 150 }}>
                 Action
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-        
             {rows?.map((row) => {
               return (
                 <React.Fragment key={row._id}>
-                  <TableRow hover role="checkbox" tabIndex={-1} style={{
-                    height: 33
-                  }}>
+                  <TableRow
+                    hover
+                    role="checkbox"
+                    tabIndex={-1}
+                    style={{
+                      height: 33,
+                    }}
+                  >
                     {editingRow == row ? (
                       <TableCell>
                         <IconButton
@@ -512,38 +443,43 @@ const RateChargesComponent = () => {
                           aria-label="OK"
                           onClick={() => handleRowSubmit(editedRowData, "edit")}
                         >
-                         <CheckCircleIcon/>
+                          <CheckCircleIcon />
                         </IconButton>
                         <IconButton
                           color="secondary"
                           aria-label="Cancel"
                           onClick={handleRowCancel}
                         >
-                         <CancelIcon/>
+                          <CancelIcon />
                         </IconButton>
                       </TableCell>
                     ) : (
                       <TableCell>
                         <IconButton color="primary" aria-label="Edit">
-                          <EditIcon onClick={() => handleEditRow(row, "row")} />
+                          <EditIcon
+                            onClick={() => handleEdit_AddRow(row, "row")}
+                          />
                         </IconButton>
                         <IconButton color="secondary" aria-label="Delete">
-                          <DeleteIcon  onClick={() => handleDeleteRow(row._id, "receivableRow")}/>
+                          <DeleteIcon
+                            onClick={() =>
+                              handleDeleteRow(row._id, "receivableRow")
+                            }
+                          />
                         </IconButton>
                         <IconButton color="secondary" aria-label="AddSubRow">
                           <PetrolPumpIcon
-                            onClick={() => handleEditRow(row, "addSubRow")}
+                            onClick={() => handleEdit_AddRow(row, "addSubRow")}
                           />
                         </IconButton>
                       </TableCell>
                     )}
                     {columns.map((column) => (
                       <TableCell key={column.id} align={column.align}>
-                          {editingRow?._id === row?._id ? (
-                       
+                        {editingRow?._id === row?._id ? (
                           <input
                             type={column.type}
-                            style={{width:"100px"}}
+                            style={{ width: "100px" }}
                             value={editedRowData?.receivable?.[column.id]}
                             onChange={(e) =>
                               setEditedRowData({
@@ -562,43 +498,47 @@ const RateChargesComponent = () => {
                     ))}
                     {columns1.map((column) => (
                       <>
-                      <TableCell key={column.id} align={column.align}>
-                         {editingRow?._id === row?._id ? (
-                          <input
-                            type={column.type}
-                            style={{width:"100px"}}
-                            value={editedRowData?.payable?.[column.id]}
-                            onChange={(e) =>
-                              setEditedRowData({
-                                ...editedRowData,
-                                payable: {
-                                  ...editedRowData.payable,
-                                  [column.id]: e.target.value,
-                                },
-                              })
-                            }
-                          />
-                        ) : column.id == "PT_date" && row?.payable?.[column.id]? (
-                          column.format(row?.payable?.[column.id])
-                        ) : (
-                          row?.payable?.[column.id]
-                        )}
-                      </TableCell>
-                      
-                     </>
+                        <TableCell key={column.id} align={column.align}>
+                          {editingRow?._id === row?._id ? (
+                            <input
+                              type={column.type}
+                              style={{ width: "100px" }}
+                              value={editedRowData?.payable?.[column.id]}
+                              onChange={(e) =>
+                                setEditedRowData({
+                                  ...editedRowData,
+                                  payable: {
+                                    ...editedRowData.payable,
+                                    [column.id]: e.target.value,
+                                  },
+                                })
+                              }
+                            />
+                          ) : column.id == "PT_date" &&
+                            row?.payable?.[column.id] ? (
+                            column.format(row?.payable?.[column.id])
+                          ) : (
+                            row?.payable?.[column.id]
+                          )}
+                        </TableCell>
+                      </>
                     ))}
-                     <TableCell>
-                       <IconButton color="primary" aria-label="Edit">
-                         <PlaylistAddIcon
-                           onClick={() => handleEditRow(row, "subRow")}
-                         />
-                       </IconButton>
-                       <IconButton color="secondary" aria-label="Delete">
-                         <DeleteIcon    onClick={() => handleDeleteRow(row?._id, "payableRow")} />
-                       </IconButton>
-                     </TableCell>
+                    <TableCell>
+                      <IconButton color="primary" aria-label="Edit">
+                        <PlaylistAddIcon
+                          onClick={() => handleEdit_AddRow(row, "subRow")}
+                        />
+                      </IconButton>
+                      <IconButton color="secondary" aria-label="Delete">
+                        <DeleteIcon
+                          onClick={() =>
+                            handleDeleteRow(row?._id, "payableRow")
+                          }
+                        />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
-                  {console.log("rowhere", row?.subInvoice)}
+                 
                   {row?.subInvoice?.map((subInv) => (
                     <TableRow
                       hover
@@ -606,12 +546,10 @@ const RateChargesComponent = () => {
                       tabIndex={-1}
                       key={subInv._id}
                       style={{
-                       
-                   
-                        backgroundColor: '#eceff1', // Different background color for subinvoice rows
+                        backgroundColor: "#eceff1", // Different background color for subinvoice rows
                       }}
                     >
-                      {console.log("subhere", subInv)}
+                    
                       {editingSubRow == subInv ? (
                         <TableCell>
                           <IconButton
@@ -621,25 +559,35 @@ const RateChargesComponent = () => {
                               handleRowSubmit(editedSubRowData, row._id)
                             }
                           >
-                           <CheckCircleIcon/>
+                            <CheckCircleIcon />
                           </IconButton>
                           <IconButton
                             color="secondary"
                             aria-label="Cancel"
                             onClick={handleRowCancel}
                           >
-                            <CancelIcon/>
+                            <CancelIcon />
                           </IconButton>
                         </TableCell>
                       ) : (
                         <TableCell>
                           <IconButton color="primary" aria-label="Edit">
                             <EditIcon
-                              onClick={() => handleEditRow(subInv, "subRow")}
+                              onClick={() =>
+                                handleEdit_AddRow(subInv, "subRow")
+                              }
                             />
                           </IconButton>
                           <IconButton color="secondary" aria-label="Delete">
-                            <DeleteIcon   onClick={() => handleDeleteRow(row?._id, "subRowReceivable",subInv?._id)} />
+                            <DeleteIcon
+                              onClick={() =>
+                                handleDeleteRow(
+                                  row?._id,
+                                  "subRowReceivable",
+                                  subInv?._id
+                                )
+                              }
+                            />
                           </IconButton>
                         </TableCell>
                       )}
@@ -649,7 +597,7 @@ const RateChargesComponent = () => {
                             <input
                               type={column.type}
                               value={editedSubRowData?.receivable?.[column.id]}
-                              style={{width:"100px"}}
+                              style={{ width: "100px" }}
                               onChange={(e) =>
                                 setEditedSubRowData({
                                   ...editedSubRowData,
@@ -671,7 +619,7 @@ const RateChargesComponent = () => {
                             <input
                               type={column.type}
                               value={editedSubRowData?.payable?.[column.id]}
-                              style={{width:"100px"}}
+                              style={{ width: "100px" }}
                               onChange={(e) =>
                                 setEditedSubRowData({
                                   ...editedSubRowData,
@@ -682,7 +630,8 @@ const RateChargesComponent = () => {
                                 })
                               }
                             />
-                          ) : column.id == "PT_date" && subInv?.payable?.[column.id] ? (
+                          ) : column.id == "PT_date" &&
+                            subInv?.payable?.[column.id] ? (
                             column.format(subInv?.payable?.[column.id])
                           ) : (
                             subInv?.payable?.[column.id]
@@ -690,21 +639,28 @@ const RateChargesComponent = () => {
                         </TableCell>
                       ))}
                       <TableCell>
-                       <IconButton color="primary" aria-label="Edit">
-                         <PlaylistAddIcon
-                           onClick={() => handleEditRow(row, "subRow")}
-                         />
-                       </IconButton>
-                       <IconButton color="secondary" aria-label="Delete">
-                         <DeleteIcon    onClick={() => handleDeleteRow(row?._id, "subRowPayable",subInv._id)} />
-                       </IconButton>
-                     </TableCell>
+                        <IconButton color="primary" aria-label="Edit">
+                          <PlaylistAddIcon
+                            onClick={() => handleEdit_AddRow(row, "subRow")}
+                          />
+                        </IconButton>
+                        <IconButton color="secondary" aria-label="Delete">
+                          <DeleteIcon
+                            onClick={() =>
+                              handleDeleteRow(
+                                row?._id,
+                                "subRowPayable",
+                                subInv._id
+                              )
+                            }
+                          />
+                        </IconButton>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </React.Fragment>
               );
             })}
-           
           </TableBody>
         </Table>
       </TableContainer>
